@@ -1,0 +1,89 @@
+import java.lang.System;
+import java.io.*;
+
+class Lexer {
+
+	Yylex tokenizer;
+	public  Lexer(String fileName) 
+	{
+	  try
+	  {
+	  tokenizer=new Yylex(new BufferedReader(new FileReader(fileName)));
+	  }
+	  catch(Exception e)
+	  {
+	  
+	  }	 
+	}
+	public Token nextToken()
+	{
+		Token next=null;
+		try
+		{
+		 next=  tokenizer.getToken();
+		}
+		catch(Exception e)
+		{
+		}
+		return next;
+	}
+	}
+
+
+%%
+
+
+%function getToken
+%type Token
+%char
+%line
+
+
+%{
+	//initialize  variables to be used by class
+%}
+
+
+%init{
+
+//Add code to be executed on initialization of the lexer
+
+%init}
+
+START=(\\documentclass\{(.)+\})
+PACKAGE=(\\usepackage\[(.)+\]\{(.)+\})
+COMMENT=(%(.)*)
+NEWLINE=[\n]
+BEGIN=(\\begin\{document\})
+TITLE=(\\title)
+DATE=(\\date)
+SUBTITLE=(\\subtitle)
+TEXTBF=(\\textbf)
+SECTION=(\\section)
+TEXT=(\{(.)*\})
+MAKE=(\\maketitle)
+END=(\\end\{document\})
+BODY=([a-zA-Z,."" ""])*
+
+
+
+%% 
+<YYINITIAL> {START} { return (new Token(Token.DOC_CLASS,yytext()));}
+<YYINITIAL> {PACKAGE} { return (new Token(Token.PACKAGE,yytext()));}
+<YYINITIAL> {COMMENT} {}
+<YYINITIAL> {BEGIN} {return (new Token(Token.BEGIN,yytext()));}
+<YYINITIAL> {TITLE} {return (new Token(Token.TITLE,yytext()));}
+<YYINITIAL> {TEXTBF} {return (new Token(Token.BF,yytext()));}
+<YYINITIAL> {TEXT} {return (new Token(Token.TEXT,yytext()));}
+<YYINITIAL> {MAKE} {return (new Token(Token.MAKE,yytext()));}
+<YYINITIAL> {END} {return (new Token(Token.END,yytext()));}
+<YYINITIAL> {SECTION} {return (new Token(Token.SECTION,yytext()));}
+<YYINITIAL> {DATE} {return (new Token(Token.DATE,yytext()));}
+<YYINITIAL> {SUBTITLE} {return (new Token(Token.SUB_TITLE,yytext()));}
+<YYINITIAL> {BODY} {return (new Token(Token.BODY,yytext()));}
+<YYINITIAL> {NEWLINE} {return (new Token(Token.NEWLINE,yytext()));
+}
+
+<YYINITIAL> . {
+  return new Token(Token.ERROR, "Invalid input: " + yytext());
+}
